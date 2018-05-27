@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>cities</title>
+        <link rel='stylesheet' href='cities.css'>
+    </head>
+   
+    <body>
+        <input type='text' id='search' class='search' /> 
+        <script>
+           function fetchCities () {
+                var xhr = new XMLHttpRequest();
+                xhr.onload = citiesJson;
+                xhr.open('GET', 'https://gist.githubusercontent.com/sandeepreddy123/1c820d62ec3023838d92faf520d6fe24/raw/7c6672cdb716686b933ac5ea34ad0f70ae989fd8/cities.json');
+                xhr.send();
+            }
+           
+
+            function citiesJson (xhr) {
+                console.log(xhr, xhr.responseText);
+            }
+            fetchCities();
+        </script>
+    </body>
+</html>

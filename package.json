@@ -1,0 +1,36 @@
+{
+  "name": "curiosity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --env development",
+    "build": "webpack --env production",
+    "watch": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandeepreddyannam/curiosity.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sandeepreddyannam/curiosity/issues"
+  },
+  "homepage": "https://github.com/sandeepreddyannam/curiosity#readme",
+  "dependencies": {
+    "html-webpack-plugin": "^2.30.1",
+    "lodash": "^4.17.4",
+    "mammoth": "^1.4.4",
+    "typescript": "^2.7.2",
+    "webpack": "^3.10.0",
+    "webpack-watchman-plugin": "^1.1.0"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.9",
+    "style-loader": "^0.20.1",
+    "webpack-dev-server": "^2.11.1",
+    "webpack-merge": "^4.1.1"
+  }
+}

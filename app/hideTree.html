@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+  <ul class="tree" id="tree">
+    <li>Animals
+      <ul>
+        <li>Mammals
+          <ul>
+            <li>Cows</li>
+            <li>Donkeys</li>
+            <li>Dogs</li>
+            <li>Tigers</li>
+          </ul>
+        </li>
+        <li>Other
+          <ul>
+            <li>Snakes</li>
+            <li>Birds</li>
+            <li>Lizards</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>Fishes
+      <ul>
+        <li>Aquarium
+          <ul>
+            <li>Guppy</li>
+            <li>Angelfish</li>
+          </ul>
+        </li>
+        <li>Sea
+          <ul>
+            <li>Sea trout</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  
+  <script>
+    let tree = document.getElementById('tree');
+   // console.log(tree.children);
+    
+    tree.addEventListener('click', function(event) {
+      if(event.target.tagName === 'LI' && event.target.firstElementChild) {
+        event.target.firstElementChild.hidden = !event.target.firstElementChild.hidden;
+       console.log(event.target.firstElementChild);
+      }
+    });
+    
+    
+    //constructTree(tree);
+    
+    
+    function constructTree(element) {
+      for (let elem of element.children) {
+        if(elem.children.length >= 1) {
+           console.log(elem);
+          constructTree(elem);
+        }
+     
+    }
+    }
+    
+  </script>
+  
+  
+  
+  
+  
+  
+  
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+.idea
+node_modules
+*.bundle.*
+*.log
+public
+build
+sw.bundle.js
+server/*.html
+.DS_Store
+buildprops
+*.gzip
+build-*
