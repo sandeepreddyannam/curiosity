@@ -1,142 +1,211 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>To Do List</title>
-        <style>
-            .container {
-                background-color: #878787;
-                text-align: center;
-                min-height: 600px;
-                margin: 0 auto;
-                width: 800px;
-            }
-            .input {
-                width: 300px;
-                padding: 10px;
-                border: none;
-                border-radius: 30px;
-                margin-bottom: 16px;
-                font-size: 16px;
-                margin-right: 10px;
-                margin-top: 10px;
-            }
-            .input:disabled {
-                background: cadetblue;
-                color: white;
-            }
-            .display {
-                color: #fff;
-            }
-            /*.newtodo {
-                position: relative;
-            }
-            .addtodo {
-                font-size: 16px;
-                padding: 20px;
-                color: #fff;
-                cursor: pointer;
-            } 
-            .add {
-                padding: 10px;
-                color: #fff;
-                cursor: pointer;
-            }
-            .add:hover {
-                border-radius: 10px;
-                background: blue;
-            }
-            .close {
-                padding: 10px;
-                color: #fff;
-                cursor: pointer;
-            }
-            .close:hover {
-                border-radius: 10px;
-                background: red
-            }
-            .checkmark {
-                height: 25px;
-                width: 25px;
-                background-color: #eee;
-            } */
-        </style>
-    </head>
-    <body>
-        <div class='container'>
-            <div class='todo-container'>
-                    <input  type='text' class='input' onChange='addTodo(event)'/>
-                    <div class='display'></div>
-            </div>
-           
+	<head>
+		<title>To Do List</title>
+		<style>
+			.container {
+				background-color: #878787;
+				min-height: 600px;
+				margin: 0 auto;
+				width: 800px;
+			}
+			.todo-container {
+				width: 450px;
+				margin: 0 auto;
+			}
+			.row {
+				display: flex;
+				position: relative;
+				cursor: pointer;
+			}
+			.close {
+				position: absolute;
+				right: 0;
+				top: 9px;
+			}
+			.row:hover .close::after {
+				content: 'x';
+				background: dimgray;
+				padding: 5px;
+				width: 10px;
+				border-radius: 11%;
+				line-height: 24px;
+				font-family: sans-serif;
+			}
+			.input {
+				width: 300px;
+				padding: 10px;
+				border: none;
+				border-radius: 30px;
+				margin-bottom: 16px;
+				font-size: 22px;
+				font-family: cursive;
+				margin-right: 10px;
+				margin-top: 10px;
+			}
+			.input:disabled {
+				background: cadetblue;
+				color: white;
+			}
+			.display {
+				color: #fff;
+			}
+			li {
+				font-size: 22px;
+				font-family: cursive;
+				list-style: none;
+				padding-left: 14px;
+				margin-bottom: 10px;
+			}
+			.checkbox {
+				cursor: pointer;
+				position: relative;
 
-        </div>
-        <script>
-            const todoList = {
-                todos: []
-            };
-            function addTodo (todo) {
-                todoList.todos.push({text: todo.target.value});
-                const displayNode = document.querySelector('.display');
-                const todoNode = document.createElement('li');
-                todoNode.innerText = todo.target.value;
-                displayNode.appendChild(todoNode);
-                todo.target.value = '';
-                console.log(todoList);
-            }
+				
+			}
+			.control {
+				visibility: hidden;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
 
-            function displayTodos (list=[]) {
-                const displayNode = document.querySelector('.display');
-                list.map(item => {
-                    const todoNode = document.createElement('li');
-                    todoNode.innerText = item.text;
-                    displayNode.appendChild(todoNode);
-                })
+			.control:checked + .control-indicator {
+				background-color: white;
+				border: 1.4px solid white;
+				border-radius: 1.5px;
+				cursor: pointer;
+					
+				}
+				.control:checked + .control-indicator::before {
+					position: absolute;
+					content: '';
+					left: 7px;
+					top: 3px;
+					width: 5px;
+					height: 13px;
+					border: solid green;
+					border-width: 0 3px 3px 0;
+					transform: rotate(45deg);
+					backface-visibility: hidden;
+						display: block;
+					}
+			
 
-            }
+			.control-indicator {
+				position: relative;
+				width: 25px;
+				height: 25px;
+				background-color: #eee;
+				border: 1.4px solid black;
+				border-radius: 1.5px;
+				box-sizing: border-box;
+				display: inline-block;
+				vertical-align: middle;
+				cursor: pointer;
 
-           // displayTodos(todoList.todos);
+			}
+			.input-wrap {
+				display: flex;
+			}
+			#clear {
+				cursor: pointer;
+				font-size: 22px;
+				margin-top: 24px;
+				color: #fff;
+				margin-left: 13px;
+			}
+			.strike {
+				text-decoration: line-through;
+			}
+			
+		</style>
+	</head>
+	<body onload='displayTodos()'>
+		<div class='container'>
+			<div class='todo-container'>
+				<div class='input-wrap'>
+						<input  type='text' class='input' placeholder='Add a todo...' onChange='addTodo(event)'/> 
+						<span id='clear'> Clear List</span>
+				</div>
+				<div class='display'></div>
+			</div>
 
+		<script>
+			const todos = JSON.parse(localStorage.getItem('myTodos')) || [];
+			let count = 0;
+	
+			function addTodo (todo) {
+				todo.target && todos.push({text: todo.target.value, index: count}); // if you add todo it will push, otherwise just displays todos from storage
+				const displayNode = document.querySelector('.display');
+				const newTodo = document.createElement('div');
+				newTodo.className = 'row'
+				displayNode.appendChild(newTodo);
 
+				const checkBox = document.createElement('input');
+				checkBox.type = 'checkbox';
+				checkBox.className = 'control';
+				const spanNode = document.createElement('div');
+				spanNode.className = 'control-indicator'
+				const labelNode = document.createElement('label');
+				labelNode.className = 'checkbox'
 
+				checkBox.addEventListener('change', changeTodo.bind(this, count));
 
-            // function createTodo () {
-            //     const container = document.querySelector('.container');
-            //     const newTodo = document.createElement('div');
-            //     newTodo.className='newtodo';
-            //     const inputBox = document.createElement('input');
-            //     inputBox.className='input';
-            //     newTodo.appendChild(inputBox);
-            //     container.appendChild(newTodo);
-            //     const add = document.createElement('span');
-            //     add.innerText = 'Add';
-            //     add.className = 'add';
-            //     newTodo.appendChild(add);
-            //     const remove = document.createElement('span');
-            //     remove.innerText = 'X';
-            //     remove.className = 'close';
-            //     newTodo.appendChild(remove);
-            //     let chbox;
+				labelNode.appendChild(checkBox);
+				labelNode.appendChild(spanNode);
+				newTodo.appendChild(labelNode);
 
-            //     add.onclick = function () {
-            //         if (inputBox.value === '') {
-            //             alert('add some task');
-            //         }
-            //         else {
-            //             inputBox.setAttribute('disabled', true);
-            //             chbox = document.createElement('input');
-            //             chbox.type = 'checkbox';
-            //             chbox.className='checkmark';
-            //             newTodo.insertBefore(chbox, inputBox);
-            //         }
-            //     }
+				const todoNode = document.createElement('li');
+				if (todo.target) {
+					todoNode.innerText = todo.target.value || todo.text;
+					todo.target.value = '';
+				} else {
+					todoNode.innerText = todo.text;
+					checkBox.checked = todo.done;
+				}
+				
+				if (todo.done) {
+					todoNode.classList.add('strike');
+				}
+				newTodo.appendChild(todoNode);
 
-            //      remove.onclick = function () {
-            //         newTodo.remove();
-            //     }
-            //    if(chbox && chbox.checked) {
-            //        alert('Congrats !!');
-            //    }
-            // }
-        </script>
-    </body>
+				const closeNode = document.createElement('span');
+				closeNode.className = 'close'
+				closeNode.addEventListener('click', deleteTodo.bind(this, count));
+				newTodo.appendChild(closeNode);
+
+				todo.target && localStorage.setItem('myTodos', JSON.stringify(todos));
+				console.log('add or display', todos, JSON.parse(localStorage.getItem('myTodos')));
+				count++;
+			}
+
+			function changeTodo(changeIndex, e) {
+				todos[changeIndex].done = !todos[changeIndex].done;
+				console.log('change todos', todos, e);
+				localStorage.setItem('myTodos', JSON.stringify(todos));
+				e.target.parentElement.nextSibling.classList.toggle('strike');
+
+			}
+
+			function displayTodos () {
+				const displayItems = JSON.parse(localStorage.getItem('myTodos'));
+				displayItems && displayItems.map((item) => {
+					addTodo(item);
+				})
+			}
+
+			function deleteTodo(deleteIndex, e) {
+				todos.splice(deleteIndex, 1);
+				console.log('delete', todos);
+				localStorage.setItem('myTodos', JSON.stringify(todos));
+				e.target.parentElement.style.display = 'none';
+			}
+
+			document.getElementById('clear').onclick = function () {
+				localStorage.clear();
+				window.location.reload();
+			}
+		</script>
+	</body>
 </html>
