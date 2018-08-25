@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Credit card form</title>
+        <style>
+            .container {
+                width: 500px;
+                background: gray;
+                padding: 60px;
+                text-align: center;
+            }
+            #card {
+                width: 300px;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+            }
+            #card:invalid {
+                border: solid 1px red;
+            }
+            #card:valid {
+                border: solid 1px green;
+            }
+            #card:valid::after {
+					content: '';
+					width: 5px;
+					height: 13px;
+					border: solid green;
+					border-width: 0 3px 3px 0;
+					transform: rotate(45deg);
+					backface-visibility: hidden;
+					display: block;
+            }
+            #card:focus {
+                outline: none;
+            }
+            #name {
+                width: 150px;
+                padding: 12px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
+            #expiry {
+                width: 165px;
+                padding: 12px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+                font-family: sans-serif;
+                margin-right: 8px;
+            }
+            #cvv {
+                width: 105px;
+                padding: 12px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+                font-family: sans-serif;
+            }
+            button {
+                width: 144px;
+                background: darkgreen;
+                color: white;
+                padding: 12px;
+                border: none;
+                font-size: 14px;
+                border-radius: 5px;
+            }
+            
+        
+        </style>
+    </head>
+    <body>
+        <form class='container'>
+            <input type='text' placeholder='Enter Card Number' id='card' maxLength='19' pattern="[0-9]{4}\s[0-9]{4}\s[0-9]{4}\s[0-9]{4}" autofocus />
+            <div class='date-cvv'>
+                <input type='month' id='expiry' placeholder='Enter Expiry Date'/>
+                <input type='number' id='cvv' placeholder='Enter CVV' max="3"/>
+            </div>
+            <input type="text" id='name' placeholder='Card Holder Name' />
+            <button type='submit' id='submit'> Submit </button>
+        </form>
+        <script>
+            var card = document.getElementById('card');
+            card.oninput = function() {
+                console.log(card.value, card.value.length);
+                var newval = '';
+                var val = card.value;
+                val = val.replace(/\s/g, '');
+                for(var i=0; i < val.length; i++) {
+                    if(i%4 == 0 && i > 0) newval = newval.concat(' ');
+                    newval = newval.concat(val[i]);
+                }
+                card.value = newval;
+            }
+            var expiryInput = document.getElementById('expiry');
+            expiryInput.onchange = function () {
+                console.log(expiryInput.value);
+            }
+        </script>
+    </body>
+</html>

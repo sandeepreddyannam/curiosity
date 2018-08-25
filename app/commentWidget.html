@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Commenting form</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            .container {
+                width: 650px;
+                padding: 60px;
+                border: solid 1px #878787;
+                box-shadow: 6px 6px 5px #888888;
+            }
+            .card {
+                width: 300px;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+            }
+            .userName {
+                width: 150px;
+                padding: 15px;
+                margin: 5px 0 22px 0;
+                display: inline-block;
+                border: none;
+                background: #f1f1f1;
+                font-size: 14px;
+                border-radius: 5px;
+                margin-left: 8px;
+            }
+            button {
+                padding: 8px;
+                margin-left: 8px;
+                font-weight: 500;
+            }
+            .comment-container {
+                padding: 10px;
+                padding-left: 30px;
+            }
+            .user-name {
+                padding-right: 10px;
+                font-size: 22px;
+                color: #2874f0;
+            }
+            .time {
+                color: #878787;
+                font-size: 12px;
+            }
+            .comment-section {
+                padding-top: 8px;
+            }
+            .reply {
+                color: #878787;
+                font-size: 12px;
+                padding-top: 5px;
+                cursor: pointer;
+            }
+            .reply:hover {
+                text-decoration: underline;
+            }
+            .reply:hover::after {
+                content: ' >';
+            }
+            .hide {
+                display: none;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <form name='comment'>
+                <input id='card' class='card' placeholder="comment here..." autofocus />
+                <input id='userName' class='userName' placeholder="enter your id"/>
+                <button type="submit">Submit</button>
+            </form>
+            <div id='commentList'>
+
+            </div>
+        </div>
+
+        <script>
+            var commentResponse = []
+                
+            document.forms.comment.onsubmit = function(event) {
+                event.preventDefault();
+                console.log(card.value, userName.value);
+                var date = new Date();
+                const commentList = document.getElementById('commentList');
+                addCommentWidget({
+                    userId: userName.value,
+                    comment: card.value,
+                    timeStamp: new Date(),
+                    parentNode: commentList//optimise date thing
+                });
+                commentResponse.push({
+                    userId: userName.value,
+                    comment: card.value,
+                    timeStamp: new Date() //optimise date thing
+                });
+                console.log(commentResponse);
+                this.reset();
+
+            }
+
+            function addCommentWidget(addedComment) {
+            
+               // const commentList = document.getElementById('commentList');
+                const container = document.createElement('div');
+                const head = document.createElement('div');
+                const usernode = document.createElement('span');
+                usernode.textContent = addedComment.userId;
+                usernode.className = 'user-name';
+                const usertime = document.createElement('span');
+                usertime.textContent = addedComment.timeStamp;
+                usertime.className = 'time';
+                
+                const footer = document.createElement('div');
+                footer.textContent = addedComment.comment;
+                footer.className = 'comment-section';
+                container.className = 'comment-container';
+                container.setAttribute('id',  addedComment.userId);
+
+                const replyNode = document.createElement('div');
+                replyNode.textContent = 'Reply';
+                replyNode.className = 'reply';
+                replyNode.addEventListener('click', addReplyBox.bind(this, addedComment));
+
+                head.appendChild(usernode);
+                head.appendChild(usertime);
+                container.appendChild(head);
+                container.appendChild(footer);
+                container.appendChild(replyNode);
+                addedComment.parentNode.appendChild(container);
+               
+            }
+
+            function addReplyBox(comment) {
+                console.log('reply', comment);
+                const replyForm = document.createElement('form');
+
+                const replyComment = document.createElement('input');
+                replyComment.className = 'card';
+                replyComment.setAttribute('placeholder', 'reply here...');
+                replyComment.setAttribute('autofocus', '');
+                replyComment.setAttribute('name', 'replyComment');
+
+                const replyUser = document.createElement('input');
+                replyUser.className = 'userName';
+                replyUser.setAttribute('placeholder', 'enter your id');
+                replyUser.setAttribute('name', 'replyUser');
+
+                replyForm.appendChild(replyComment);
+                replyForm.appendChild(replyUser);
+
+                const submitReply = document.createElement('button');
+                submitReply.textContent = 'submit';
+                submitReply.setAttribute('type', 'submit');
+                //replyForm.addEventListener('submit', submitReplyMethod.bind(this, event));
+                replyForm.onsubmit = function(event) {
+                    event.preventDefault();
+                    console.log(event.target.elements.replyComment.value, event.target.elements.replyUser.value, new Date());
+                    const replyParent = document.getElementById(comment.userId);
+                    addCommentWidget({
+                        userId: event.target.elements.replyUser.value,
+                        comment: event.target.elements.replyComment.value,
+                        timeStamp: new Date(),
+                        parentNode: replyParent
+                    });
+                    replyForm.classList.add('hide');
+                }
+                
+                replyForm.appendChild(submitReply);
+
+                comment.userId && document.getElementById(comment.userId).appendChild(replyForm);
+            }
+
+            function submitReplyMethod(event, x, y) {
+                console.log(event);
+                event.preventDefault();
+
+            }
+        </script>
+    </body>
+</html>
