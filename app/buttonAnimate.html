@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Button animations</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+        <style>
+            .btn-container {
+                display: flex;
+                background-color: black;
+                
+                /* center vertically */
+                padding-top: 150px;
+                padding-bottom: 150px;
+                /* center horizontally */
+                justify-content: center;
+            }
+            .btn {
+                display: inline-block;
+                cursor: pointer;
+                width: 50px;
+                height: 50px;
+                margin: 5px;
+                font-size: 25px;
+                color: gray;
+                
+                /*  Circles  */
+                border-radius: 25px;
+                background-color: rgb(255, 255, 255);
+
+                /* center icons */
+                text-align: center;
+                line-height: 50px;
+                transition: width 1s ease-in;
+                
+                }
+            .expand {
+                color: white; 
+                width: 100px;
+                height: 50px;
+                /* animation: bounce 300ms cubic-bezier(0.5, 1, 0.5, 1);
+                animation-fill-mode: forwards; */
+                transition: width cubic-bezier(0.075, 0.82, 0.165, 0.5) ease-in, backgroundColor cubic-bezier(0.075, 0.82, 0.165, 1) ease-in;
+            }
+            @keyframes bounce {
+                0% {
+                    color: gray;
+                    width: 50px;
+                }
+                70% {
+                    width: 116px;
+                }
+                90% {
+                    width: 92px;
+                }
+                100% {
+                    color: #fff;
+                    width: 100px;
+                }
+            }
+                
+        </style>
+    </head>
+    <body>
+        <div>
+            <div class="btn-container">
+                    <div class="btn" onClick='animateButton(event, 0)'>
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="btn" onClick='animateButton(event, 1)'>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="btn" onClick='animateButton(event, 2)'>
+                        <i class="fas fa-map-marker"></i>
+                    </div>
+                    <div class="btn" onClick='animateButton(event, 3)'>
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+        </div>
+        <script>
+                const colorList = [
+                    {
+                        'icon': 'comment',
+                        'color': '#EDB205',
+                        'bgColor': '#DE9B00'
+                    }, {
+                        'icon': 'user',
+                        'color': '#4BD389',
+                        'bgColor': '#3EAF6F'
+                    }, {
+                        'icon': 'map-marker',
+                        'color': '#E61753',
+                        'bgColor': '#BE0031'
+                    }, {
+                        'icon': 'cog',
+                        'color': '#B32DD2',
+                        'bgColor': '#8E00AC'
+                    }
+                ];
+                function animateButton(event, index) {
+                    const buttonStyle = document.querySelectorAll('.btn')[index];
+                    buttonStyle.classList.toggle('expand');
+                    buttonStyle.style.backgroundColor = colorList[index].color;
+
+                    const container = document.querySelector('.btn-container');
+                    container.style.backgroundColor = colorList[index].bgColor;
+
+                    const allButtons = document.querySelectorAll('.btn');
+                    for (let i=0; i<allButtons.length; i++) {
+                        if (i !== index) {
+                            allButtons[i].classList.remove('expand');
+                        }
+                        
+                    }
+                }
+        </script>
+        
+    </body>
+</html>

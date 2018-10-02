@@ -81,6 +81,42 @@
                 font-size: 14px;
                 border-radius: 5px;
             }
+
+            #message {
+                display:none;
+                background: #f1f1f1;
+                color: #000;
+                position: relative;
+                padding: 20px;
+                margin-top: 10px;
+            }
+
+            #message p {
+                padding: 10px 35px;
+                font-size: 18px;
+            }
+
+            /* Add a green text color and a checkmark when the requirements are right */
+            .valid {
+                color: green;
+            }
+
+            .valid:before {
+                position: relative;
+                left: -35px;
+                content: "✔";
+            }
+
+            /* Add a red text color and an "x" when the requirements are wrong */
+            .invalid {
+                color: red;
+            }
+
+            .invalid:before {
+                position: relative;
+                left: -35px;
+                content: "✖";
+            }
             
         
         </style>
@@ -92,8 +128,15 @@
                 <input type='month' id='expiry' placeholder='Enter Expiry Date'/>
                 <input type='number' id='cvv' placeholder='Enter CVV' max="3"/>
             </div>
-            <input type="text" id='name' placeholder='Card Holder Name' />
+            <input type="password" id='name' placeholder='Card Holder Name' />
             <button type='submit' id='submit'> Submit </button>
+            <div id="message">
+                <h3>Password must contain the following:</h3>
+                <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+                <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+                <p id="number" class="invalid">A <b>number</b></p>
+                <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+            </div>
         </form>
         <script>
             var card = document.getElementById('card');
@@ -112,6 +155,27 @@
             expiryInput.onchange = function () {
                 console.log(expiryInput.value);
             }
+
+            var pwd = document.getElementById('name');
+            pwd.onfocus = function() {
+                document.getElementById('message').style.display = 'block'
+            }
+            pwd.onblur = function() {
+                document.getElementById('message').style.display = 'none'
+            }
+            pwd.addEventListener('keyup', function(event) {
+                console.log(event);
+                const key = event.key;
+                var letter = document.getElementById('letter');
+                var capital = document.getElementById('capital');
+                var number = document.getElementById('number');
+                var length = document.getElementById('length');
+                if (key === key.toUpperCase()) {
+                    capital.className = 'valid';
+                    // add one more
+                }
+            })
+
         </script>
     </body>
 </html>
