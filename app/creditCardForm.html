@@ -38,6 +38,19 @@
             #card:focus {
                 outline: none;
             }
+            #show-password {
+                width: 30px;
+                height: 32px;
+                color: black;
+                position: absolute;
+                border: none;
+                right: 12px;
+                padding: 0;
+                top: 11px;
+                /* border-radius: 50%; */
+                background: #f1f1f1;
+                font-size: 14px;
+            }
             #name {
                 width: 150px;
                 padding: 12px;
@@ -48,6 +61,7 @@
                 font-size: 14px;
                 border-radius: 5px;
                 margin-right: 10px;
+                position: relative;
             }
             #expiry {
                 width: 165px;
@@ -117,18 +131,40 @@
                 left: -35px;
                 content: "✖";
             }
+            button:focus {
+                outline: none;
+            }
+
+            #img-password {
+                animation: fadeInUp 2s ease-in 10ms 1 forwards;
+            }
+
+            @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+            }
             
         
         </style>
     </head>
     <body>
         <form class='container'>
-            <input type='text' placeholder='Enter Card Number' id='card' maxLength='19' pattern="[0-9]{4}\s[0-9]{4}\s[0-9]{4}\s[0-9]{4}" autofocus />
+            <input type='text' placeholder='Enter Card Number' id='card' maxLength='19' pattern="[0-9]{4}\s[0-9]{4}\s[0-9]{4}\s[0-9]{4}" autofocus >
             <div class='date-cvv'>
                 <input type='month' id='expiry' placeholder='Enter Expiry Date'/>
                 <input type='number' id='cvv' placeholder='Enter CVV' max="3"/>
             </div>
-            <input type="password" id='name' placeholder='Card Holder Name' />
+            <div style="position: relative; display: inline-flex;">
+                <input type="password" id='name' placeholder='Some password' />
+                <button id='show-password'>
+                    <img id='img-password' src='./Icons/eye_closed-512.png' style="width: 30px; height: 30px;" />
+                </button>
+            </div>
             <button type='submit' id='submit'> Submit </button>
             <div id="message">
                 <h3>Password must contain the following:</h3>
@@ -140,10 +176,15 @@
         </form>
         <script>
             var card = document.getElementById('card');
-            card.oninput = function() {
+            card.oninput = function(e) {
                 console.log(card.value, card.value.length);
                 var newval = '';
                 var val = card.value;
+                // const regex = new RegExp(/^\d+$/);
+                // if(!regex.test(card.value)) {
+                //     e && e.preventDefault();
+                //     console.log('not matched matched');
+                // }
                 val = val.replace(/\s/g, '');
                 for(var i=0; i < val.length; i++) {
                     if(i%4 == 0 && i > 0) newval = newval.concat(' ');
@@ -170,10 +211,34 @@
                 var capital = document.getElementById('capital');
                 var number = document.getElementById('number');
                 var length = document.getElementById('length');
-                if (key === key.toUpperCase()) {
+                if (key.match(/[A-Z]/g)) {
                     capital.className = 'valid';
-                    // add one more
                 }
+                if (key.match(/[a-z]/g)) {
+                    letter.className = 'valid';
+                }
+                if (key.match(/[0-9]/g)) {
+                    number.className = 'valid';
+                }
+                if (pwd.value.length === 8) {
+                    length.className = 'valid';
+                }
+            });
+
+            var showPassword = document.getElementById('show-password');
+            var icon = document.getElementById('img-password');
+
+            showPassword.addEventListener('click', function(event) {
+                event.preventDefault();
+                if(pwd.type === 'password') {
+                    pwd.type = 'text';
+                    icon.src = './Icons/eye-open.png';
+                
+                } else {
+                    pwd.type = 'password';
+                    icon.src = './Icons/eye_closed-512.png';
+                }
+
             })
 
         </script>

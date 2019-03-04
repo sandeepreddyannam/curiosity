@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Compare widget</title> 
+		<style>
+			body {
+				font-family: Arial;
+			}
+			div {
+				margin-bottom: 10px;
+			}
+			img {
+				width: 300px;
+				margin-bottom: 10px;
+			}
+			.summary-container {
+				display: flex
+			}
+			.summary{
+				border-bottom: solid 1px #f0f0f0;
+				height: 332px
+			}
+			.item {
+				width: 25%;
+				margin-right: 30px;
+				position: relative;
+			}
+			.cross {
+				position: absolute;
+				right: 8px;
+				padding: 5px;
+				border: solid 1px;
+			}
+			.add {
+				display: none;
+				font-size: 58px;
+				margin-top: 100px;
+				margin-left: 40px;
+				width: 300px;
+			}
+			
+		</style>
+	</head>
+	<body onload="fetchCompareJson()">
+		<div class='container'>
+			
+			<div class='summary-container'>
+				<div class='item' id='prefix'>
+							Compare
+					</div>
+				<div class='item' id='item0'>
+					<div class='cross' onclick="deletItem(item0)">
+						x
+					</div>
+					
+				</div>
+				<div class='item' id='item1'>
+						<div class='cross' onclick="deletItem(item1)">
+								x
+							</div>
+				</div>
+				
+				
+				<div class='add' id='add'>
+					+
+				</div>
+
+			</div>
+			
+		</div>
+
+		<script>
+			// Fetching api;
+			var compareRes = {};
+			var allPids = [];
+			
+			function fetchCompareJson() {
+				const url = 'https://flipkart-mock-product.now.sh/';
+				fetch(url).then(res=>{
+					return res.json()
+				}).then(json => {
+					compareRes = json;
+					console.log(compareRes);
+
+					// formatResponse(json);
+					// may be pass it to func.
+				}).catch(err => console.log(err));
+			}
+
+			// function formatResponse (res) {
+			// 	//extract pids
+			// 	const pids = Object.keys(res.products.compareSummary.images);
+			// 	allPids = pids;
+
+			// 	// console.log(pids);
+			// 	// exract summary;
+			// 	const images = res.products.compareSummary.images;
+			// 	const titles = res.products.compareSummary.titles;
+			// 	const productPricingSummary = res.products.compareSummary.productPricingSummary;
+			// 	const featuresList = res.products.featuresList;
+			// 	const formattedRes = {};
+			// 	pids.map(pid => {
+			// 		formattedRes[pid] = {
+			// 			image: images[pid],
+			// 			summary: {
+			// 				...productPricingSummary[pid],
+			// 			titles: titles[pid]
+			// 			}
+			// 		};
+			// 	});
+			// 	featuresList.map(item => {
+			// 		item.features.map(eachItem => {
+			// 			Object.keys(eachItem.values).map(pid => {
+			// 				const featuresObj = {
+			// 					features: {
+			// 						[eachItem.featureName]: eachItem.values[pid]
+			// 					}
+			// 				}
+			// 				formattedRes[pid] = Object.assign({}, formattedRes[pid], {features: {...formattedRes[pid].features, ...featuresObj.features}});
+						
+			// 			})
+			// 			// eachItem.values[]
+			// 		})
+			// 	})
+			// 	console.log(formattedRes);
+			// 	compareRes = formattedRes;
+			// 	// renderPrfixes(formattedRes);
+			// 	renderSummary(formattedRes);
+			// }
+
+			function deletItem(id) {
+				console.log('id', id, id.parentNode);
+				const parent = id.parentNode;
+				parent.removeChild(id);
+				const add = document.getElementById('add');
+				add.style.display = 'block';
+
+			}
+
+			function renderSummary(res) {
+				Object.keys(res).map((item, index) => {
+					if(index<2) {
+						// renderPrfixes(item)
+						reanderEachsummaryUnit(res[item], index);
+					}
+				})
+			}
+
+			function reanderEachsummaryUnit(item, index) {
+					console.log(item, index);
+					const itemId = `item${index}`;
+					let firstItem = document.getElementById(itemId);
+					// if (!firstItem) {
+					// 	const id = document.createElement('div');
+					// 	id.setAttribute('id', `item${index}`);
+					// 	firstItem = id;
+					// }
+					const summContEl =  document.createElement('div');
+					summContEl.className = 'summary'
+
+					const imgEl = document.createElement('img');
+					imgEl.setAttribute('src', item.image);
+
+					const titleEl = document.createElement('div');
+					titleEl.textContent = item.summary.titles.title;
+
+					const subTitleEl = document.createElement('div');
+					if(item.summary.titles.subtitle ) {
+						subTitleEl.textContent = item.summary.titles.subtitle;
+					}
+
+					const priceEl = document.createElement('div');
+					priceEl.textContent = item.summary.price;
+
+					const finalpriceEl = document.createElement('div');
+					finalpriceEl.textContent = item.summary.finalPrice;
+
+
+					// extract feaures
+					const featuresEl = document.createElement('div');
+
+					Object.keys(item.features).map(eachFeature => {
+						const featureDiv = document.createElement('div');
+						featureDiv.textContent = `${eachFeature}::        ${item.features[eachFeature]}`;
+						featuresEl.appendChild(featureDiv);
+					})
+
+
+
+
+					summContEl.appendChild(imgEl);
+					summContEl.appendChild(titleEl);
+					summContEl.appendChild(subTitleEl);
+					summContEl.appendChild(finalpriceEl);
+					summContEl.appendChild(priceEl);
+					firstItem.appendChild(summContEl);
+					firstItem.appendChild(featuresEl);
+			}
+			// document.getElementById('item3').style.display = 'none';
+
+			document.getElementById('add').addEventListener('click', ()=> {
+				console.log('click', allPids);
+				//take element pid through select element
+				// like from allPids[] and pass it to render unit
+				//localsto
+				// 
+				const item = compareRes['TVSF3J7HUJF5XUBT'];
+				const addEl = document.createElement('div');
+				addEl.setAttribute('id', 'item3');
+
+				const summaryCntEl = document.querySelector('.summary-container');
+				summaryCntEl.appendChild(addEl);
+
+				document.getElementById('item3').style.display = 'block';
+				const add = document.getElementById('add');
+				add.style.display = 'none';
+
+				reanderEachsummaryUnit(item, 3);
+
+			});
+
+
+
+			// call each of them
+			
+
+		</script>
+	</body>
+</html>
