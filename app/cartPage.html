@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Cart Page</title>
+		<style>
+			body {
+				background: #f0f0f0;
+				font-family: Roboto, sans-serif;
+			}
+			img {
+				width: 50px;
+				margin-bottom: 12px;
+			}
+			input {
+				outline: none;
+				width: 20px;
+				text-align: center;
+				font-size: 18px;
+				padding: 4px 9px;
+				margin-right: 10px;
+			}
+			button {
+				border-radius: 50%;
+				width: 30px;
+				/* line-height: 30px; */
+				height: 30px;
+				outline: none;
+				font-size: 22px;
+				color: #878787;
+				margin-right: 10px;
+			}
+			.container {
+				display: flex;
+				width: 100%;
+				min-height: 300px;
+			}
+			.items-cont {
+				background: white;
+				width: 70%;
+			}
+			
+			.header {
+				display: flex;
+				justify-content: space-between;
+				font-weight: bold;
+				padding: 16px 24px;
+				border-bottom: solid 1px #f0f0f0;
+			}
+			.summary {
+				width: 30%;
+				background: white;
+				margin-left: 8px;
+			}
+			.sum-cont {
+				display: flex;
+				width: 70%;
+			}
+			
+			.item {
+				display: flex;
+				padding: 20px;
+				border-bottom: solid 1px #f0f0f0;
+			}
+			.img-cls {
+				width: 30%;
+				text-align: center;
+			}
+			.summary-cls {
+				/* width: 40%; */
+			}
+			.dlvry-cls {
+				width: 30%;
+				font-weight: bold;
+				font-size: 14px;
+			}
+			.title {
+				font-size: 16px;
+				padding-bottom: 16px;
+			}
+			.sp {
+				font-size: 20px;
+				font-weight: bold;
+				padding-right: 10px;
+			}
+			.mrp {
+				color: #878787;
+				padding-right: 10px;
+				text-decoration: line-through;
+			}
+			.discount {
+				font-size: 14px;
+				color: green;
+				font-weight: bold;
+			}
+			.mrp::before {
+				content: '\20B9';
+			}
+			.sp::before {
+				content: '\20B9';
+			}
+			.final-price {
+				display: flex;
+				justify-content: space-between;
+				padding: 20px;
+			}
+
+
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="items-cont">
+				<div class="header">
+					<div> MY CART</div>
+					<div>Pincode</div>
+				</div>
+				<div class="items">
+
+				</div>
+			</div>
+			<div class="summary">
+				<div class="header">
+					PRICE DETAILS
+				</div>
+				<div>
+
+				</div>
+			</div>
+			
+		</div>
+		<script>
+			getCartProducts(); // put it in some loaded method.
+			var finalRes = {};
+
+			function getCartProducts () {
+				const url = 'https://flipkart-mock-cart.now.sh/';
+				fetch(url).then(
+					res => res.json()
+				).then(json => {
+					console.log('json', json);
+					loadProducts(json);
+					renderPriceSummary();
+				})
+			}
+
+			function loadProducts(json) {
+
+				json && json.map(item => {
+					renderProduct(item);
+				})
+			}
+
+			function renderProduct(item) {
+				const summary = item.product_meta;
+				const pricing = item.pricing;
+				const availability = item.availability;
+				const purchaseInfo = item.purchase_instructions;
+				const pid = item.product_id; 
+
+				finalRes = { ...finalRes,
+					[pid] : {
+						sp: pricing.selling_price,
+						quantity: 1,
+						deliveryCharge: pricing.delivery_charge,
+						saving: pricing.mrp - pricing.selling_price
+					}
+				};
+
+				const containerEl = document.querySelector('.items');
+
+				const containerDiv = document.createElement('div');
+				containerDiv.className = 'item';
+				containerEl.appendChild(containerDiv);
+
+				const summaryDiv = document.createElement('div');
+				summaryDiv.className = 'sum-cont';
+				containerDiv.appendChild(summaryDiv);
+
+				renderImage(summary, summaryDiv, pid);
+				renderSummary(summary, pricing, summaryDiv);
+				renderDeliveryInfo(pricing, containerDiv);
+			}
+
+			function renderDeliveryInfo(pricing, parent) {
+				const deliveryCharge = pricing && pricing.delivery_charge;
+				if (!deliveryCharge) {
+					return;
+				}
+
+				const divEl = document.createElement('div');
+				divEl.innerHTML = `Delivery Charge: &#8377;${deliveryCharge}`;
+				divEl.className = 'dlvry-cls';
+
+				parent.appendChild(divEl);
+			}
+
+			function renderSummary(summary, pricing, parent) {
+				const title = summary.title;
+				const mrp = pricing && pricing.mrp;
+				const sellingPrice = pricing && pricing.selling_price;
+				
+
+				const contEl = document.createElement('div');
+				const titleEl = document.createElement('div');
+				const priceEl = document.createElement('div');
+
+				titleEl.textContent = title;
+				titleEl.className = 'title';
+
+				const spEl = document.createElement('span');
+				spEl.textContent = sellingPrice;
+				spEl.className = 'sp';
+
+				const mrpEl = document.createElement('span');
+				mrpEl.textContent = mrp; // striked out
+				mrpEl.className = 'mrp';
+
+				const discountEl = document.createElement('span');
+				const discount = ((mrp - sellingPrice) / mrp) * 100;
+				discountEl.textContent = `${Math.round(discount)}% off`;
+				discountEl.className = 'discount';
+
+				priceEl.appendChild(spEl);
+				priceEl.appendChild(mrpEl);
+				priceEl.appendChild(discountEl);
+				
+				contEl.className = 'summary-cls';
+				contEl.appendChild(titleEl);
+				contEl.appendChild(priceEl);
+
+				parent.appendChild(contEl);
+			}
+
+			function renderImage(summary, parent, pid) {
+				const img = summary.img;
+				const divEl = document.createElement('div');
+				const imgEl = document.createElement('img');
+				imgEl.src = img;
+				divEl.className = 'img-cls';
+				divEl.appendChild(imgEl);
+
+				renderCounter(divEl, pid);
+
+				parent.appendChild(divEl);
+			}
+
+			function renderCounter(parent, pid) {
+				const input = document.createElement('input');
+				input.maxLength = '1';
+				input.value = 1; 
+
+				const decEl = document.createElement('button');
+				decEl.onclick = removeItem(pid, input);
+
+
+				const incEl = document.createElement('button');
+				incEl.onclick = addItem(pid, input);
+
+				decEl.textContent = '-';
+				incEl.textContent = '+';
+
+				const divEl = document.createElement('div');
+
+				divEl.appendChild(decEl);
+				divEl.appendChild(input);
+				divEl.appendChild(incEl);
+
+				parent.appendChild(divEl);
+				console.log('final', finalRes);
+			}
+
+			function addItem (pid, input) {
+				return event => {
+					console.log(pid);
+					if (finalRes[pid].quantity > 0) {
+						finalRes[pid].quantity = finalRes[pid].quantity + 1;
+						input.value = finalRes[pid].quantity;
+					}
+					updatePriceSummary();
+					console.log(finalRes, pid);
+				}
+			}
+
+			function removeItem (pid, input) {
+				return event => {
+					console.log(pid);
+					if (finalRes[pid].quantity > 1) {
+						finalRes[pid].quantity = finalRes[pid].quantity - 1;
+						input.value = finalRes[pid].quantity;
+					}
+					updatePriceSummary();
+					console.log(finalRes, pid);
+				}
+			}
+
+			function renderPriceSummary () {
+				const priceCont = document.querySelector('.summary');
+
+				const itemQuantity = getQuantity();
+				const finalItemPrice = getFinalItemPrice();
+				const deliveryCharge = getDeliveryCharge();
+				const amountPayable = finalItemPrice + deliveryCharge;
+
+				// price of items
+				const priceDiv = document.createElement('div');
+				const itemPriceEl = document.createElement('div');
+				itemPriceEl.textContent = `Price (${itemQuantity} items)`;
+				itemPriceEl.id = 'quantity';
+
+				const rupeesDiv = document.createElement('div');
+				rupeesDiv.innerHTML = `&#8377;${finalItemPrice}`;
+				rupeesDiv.id = 'quantityRs';
+				
+				priceDiv.appendChild(itemPriceEl);
+				priceDiv.appendChild(rupeesDiv);
+				priceDiv.className = 'final-price';
+
+				// delivery of items
+				const deliveryEl = document.createElement('div');
+				const chargeEl = document.createElement('div');
+				chargeEl.textContent = 'Delivery charge'
+
+				const rupeesEl = document.createElement('div');
+				rupeesEl.innerHTML = `&#8377;${deliveryCharge}`;
+				rupeesEl.id = 'deliveryRs';
+				
+				deliveryEl.appendChild(chargeEl);
+				deliveryEl.appendChild(rupeesEl);
+				deliveryEl.className = 'final-price';
+
+				// total amount
+				const totalEl = document.createElement('div');
+				const totalTextEl = document.createElement('div');
+				totalTextEl.textContent = 'Amount Payable';
+
+				const totalRupeesEl = document.createElement('div');
+				totalRupeesEl.innerHTML = `&#8377;${amountPayable}`;
+				totalRupeesEl.id = 'totalRs';
+				
+				totalEl.appendChild(totalTextEl);
+				totalEl.appendChild(totalRupeesEl);
+				totalEl.className = 'final-price';
+
+
+				priceCont.appendChild(priceDiv);
+				priceCont.appendChild(deliveryEl);
+				priceCont.appendChild(totalEl);
+			}
+
+			function getQuantity() {
+				let q = 0;
+				Object.keys(finalRes).forEach(key => {
+					q = q + finalRes[key].quantity;
+				});
+				console.log('quantity', q);
+
+				return q;
+			}
+
+			function getFinalItemPrice() {
+				let q = 0;
+				Object.keys(finalRes).forEach(key => {
+					q = q + (finalRes[key].sp * finalRes[key].quantity);
+				});
+				console.log('SP', q);
+
+				return q;
+			}
+			function getDeliveryCharge() {
+				let q = 0;
+				Object.keys(finalRes).forEach(key => {
+					q = q + finalRes[key].deliveryCharge;
+				});
+				console.log('DC', q);
+
+				return q;
+			}
+			function updatePriceSummary () {
+				const quantity = document.getElementById('quantity');
+				const quantityRs = document.getElementById('quantityRs');
+				const deliveryRs = document.getElementById('deliveryRs');
+				const totalRs = document.getElementById('totalRs');
+
+				const itemQuantity = getQuantity();
+				const finalItemPrice = getFinalItemPrice();
+				const deliveryCharge = getDeliveryCharge();
+				const amountPayable = finalItemPrice + deliveryCharge;
+
+				quantity.textContent = `Price (${itemQuantity} items)`;
+				quantityRs.innerHTML = `&#8377;${finalItemPrice}`;
+				deliveryRs.innerHTML = `&#8377;${deliveryCharge}`;
+				totalRs.innerHTML = `&#8377;${amountPayable}`;
+
+			}
+
+
+
+
+		</script>
+
+	</body>
+</html>
