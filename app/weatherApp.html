@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Weather App
+		</title>
+		<style>
+            body{
+                width: 100%;
+                height: 1000vh;
+                background: lightblue;
+                color: white;
+                font-family: SANS-SERIF;
+            }
+            .value {
+                font-size: 80px;
+                font-family: SANS-SERIF;
+                position: relative;
+            }
+            .degrees {
+                display: inline;
+            }
+            .degrees::after {
+                content: '\2103';
+                font-size: 36px;
+                position: absolute;
+                top: 10px;
+            }
+            .location-value {
+                font-size: 30px;
+            }
+            .coord {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            .coord > div {
+                margin-right: 10px;
+            }
+            .container {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-content: center;
+                justify-content: center;
+                height: 100vh;
+            }
+            .loader-overlay {
+                width: 100vw;
+                height: 100vh;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: black;
+                opacity: 0.5;
+            }
+
+            .progress {
+                width: 100%;
+                height: 10px;
+                background: white;
+                position: absolute;
+                top: 0;
+                left: 0;
+
+            }
+            .bar {
+                background: yellow;
+                height: inherit;
+                transition: transform ease-in-out;
+                transform-origin: left;
+                /* animation: loader 2s ease-in-out 0s forwards; */
+                /* width: 0%; */
+                /* animation: move 3s linear 300ms 1 normal both; */
+            }
+
+            .scorll-progress {
+                width: 100%;
+                height: 10px;
+                background: white;
+                position: fixed;
+                top: 10px;
+                left: 0;
+            }
+            .scroll-bar {
+                background: green;
+                height: inherit;
+                /* transition: transform ease-in-out; */
+                transform-origin: left;
+                width: 0px;
+                /* animation: move 3s linear 300ms 1 normal both; */
+            }
+
+            .loader {
+                width: 50px;
+                height: 50px;
+                text-align: center;
+                border-radius: 50%;
+                border: solid 8px white;
+                border-top: solid 8px green;
+                border-bottom: solid 8px green;
+                animation: spin 1s linear 300ms infinite normal;
+            }
+            .loader-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes move {
+                0% {
+                    transform: scaleX(0);
+                }
+                100% {
+                    transform: scaleX(1);
+                }
+            }
+            
+        </style>
+    </head>
+    <body>
+
+        <div class="loader-overlay"> </div>
+        <div class="loader-container">
+            <div class="loader"> </div>
+            <div style="margin-top: 5px">Loading ...</div>
+        </div>
+        <div class="progress">
+            <div class="bar"></div>
+        </div>
+
+        <div class="scorll-progress">
+                <div class="scroll-bar"></div>
+            </div>
+
+        <div class="container">
+            <div class="value"></div>
+
+            <div class='location-value'></div>
+            <div class="coord">
+                <div class="lat"></div>
+                <div class="long"></div>
+            </div>
+        </div>
+        <script>
+            var weatherRes;
+            getLocationCoord();
+            // var isLoading = true;
+            startTimer(0);
+            var width = 1;
+            var timerId;
+
+            window.addEventListener('scroll', scrollListener);
+
+            function scrollListener(params) {
+                let bar = document.querySelector('.scroll-bar');
+                // if (bar) {
+                //     bar.style.width = window.pageYOffset+ 'px';
+                // }
+
+                var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                var scrolled = (winScroll / height) * 100;
+                console.log(scrolled, winScroll, height);
+                bar.style.width = scrolled + "%";
+            }
+
+            function startTimer (time) {
+                const bar = document.querySelector('.bar');
+                if (width >= 100) {
+                    width = 100;
+                    return;
+                }
+                width = width + Math.abs(Math.random()*10);
+                timerId = setTimeout(() => {
+                    startTimer(Math.random()*100 + 100);
+                }, time);
+                console.log('width', width, timerId, time);
+                // bar.style.width = width + '%';
+                bar.style.transform =  `scaleX(${width / 100})`;
+
+                
+            }
+
+            function getLocationCoord () {
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const coords = pos.coords;
+                        console.log('coordinates', coords);
+                        const lat = coords.latitude;
+                        const long = coords.longitude;
+
+                        getWeatherData(lat, long);
+                    }, (error) => {
+                        console.error('permission error', error);
+                        window.alert('please enable permission for location');
+                    }, {
+                        enableHighAccuracy: true
+                    });
+                }
+            }
+
+            function getWeatherData (lat, long) {
+                fetch(`https://fcc-weather-api.glitch.me/api/current?lat=${lat}&lon=${long}`).then(res => {
+                    return res.json();
+                }).then(json => {
+                    console.log(json);
+                    weatherRes = json;
+                    // hide loader after success.
+                    document.querySelector('.loader-overlay').style.display = 'none';
+                    document.querySelector('.loader-container').style.display = 'none';
+                    document.querySelector('.progress').style.display = 'none';
+                    clearTimeout(timerId);
+                    loadContent();
+                }).catch(err => {
+                    console.error('api failed', err);
+                });
+            }
+    
+            
+            function loadContent () {
+                const tempValue = document.querySelector('.value');
+                tempValue.textContent = weatherRes.main.temp;
+
+                const divEl = document.createElement('div');
+                divEl.className = 'degrees';
+                tempValue.appendChild(divEl);
+
+                const locationValue = document.querySelector('.location-value');
+                locationValue.textContent = weatherRes.name;
+
+                const lattitude = document.querySelector('.lat');
+                lattitude.textContent = `Coordinates: ${weatherRes.coord.lat}, `;
+
+                const longitude = document.querySelector('.long');
+                longitude.textContent = weatherRes.coord.lon;
+            }
+
+            // window.setInterval(getWeatherData, 2000);
+        </script>
+
+    </body>
+</html>

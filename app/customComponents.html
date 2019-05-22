@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Custom html components
+		</title>
+		<style>
+		body {
+			text-align: center;
+			margin-top: 30px;
+			font-size: 22px;
+			height: 100vh;
+		}
+		.chk-component {
+			text-align: center;
+			width: 400px;
+			margin: 0 auto;
+			padding: 5px;
+			color: #878787;
+			border-radius: 50px;
+			border: solid 1px #e0e0e0;
+			margin-bottom: 24px;
+		}
+		.check-box {
+			visibility: hidden;
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+		}
+		.custom {
+			width: 25px;
+			border: solid 2px #969696;
+			border-radius: 50%;
+			height: 25px;
+			display: inline-block;
+			margin: 5px;
+			vertical-align: middle;
+			transition: all 0.5s ease-in;
+		}
+		.check-box:checked ~.custom {
+			border-color: #1785ff;
+			background: #1785ff
+		}
+		.check-box:checked ~.custom::before {
+			content: '\2713';
+			color: white;
+			padding: 2px;
+		}
+		.check-box:hover ~.custom {
+			border-color: green;
+		}
+
+
+		.radio-box {
+			visibility: hidden;
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+		}
+		.radio-custom {
+			width: 20px;
+			height: 20px;
+			border: solid 2px #1785ff;
+			border-radius: 50%;
+			display: inline-block;
+			position: relative;
+			vertical-align: middle;
+			transition: all 0.5s ease-in;
+		}
+		.radio-box:checked ~.radio-custom {
+			border: solid 3px #1785ff;
+		}
+		.radio-box:checked ~.radio-custom:before {
+			content: '';
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 40%;
+			height: 40%;
+			margin: auto;
+			right: 0;
+			bottom: 0;
+			background: dodgerblue;
+		}
+
+		.toggle-box {
+			visibility: hidden;
+			top: 0;
+			left: 0;
+			opacity: 0;
+			position: absolute;
+		}
+		.toggle-custom {
+			width: 60px;
+			height: 30px;
+			display: inline-block;
+			vertical-align: middle;
+			border-radius: 50px;
+			position: relative;
+			background: lightgray;
+			transition: all 0.2s ease-in;
+		}
+		.toggle-custom::before {
+			content: '';
+			width: 25px;
+			height: 25px;
+			position: absolute;
+			background: white;
+			top: 2px;
+			left: 3px;
+			right: auto;
+			transform: translateX(-1px);
+			border-radius: 50px;
+			transition: all 0.5s ease;
+		}
+
+		.toggle-box:checked ~.toggle-custom {
+			background: lightgreen;
+		}
+
+		.toggle-box:checked ~.toggle-custom::before {
+			
+			/* background: black; */
+			transform: translateX(27px);
+			/* border-radius: 150px; */
+		}
+		.dropdown-main {
+			border: solid;
+			width: 150px;
+			text-align: center;
+			margin: 10px auto;
+			position: relative;
+			padding: 10px;
+		}
+
+		.arrow {
+			top: 22px;
+			right: 12px;
+			width: 0;
+			border-left: 6px solid transparent;
+			position: absolute;
+			height: 0;
+			border-right: 6px solid transparent;
+			border-top: 6px solid black;
+			transform: rotate(0deg);
+			transition: transform ease 0.5s;
+		}
+		.reverse-arrow {
+			transform: rotate(180deg);
+			transition: transform ease 0.5s;
+		}
+		.option-cont {    
+			position: absolute;
+			border: solid 1px;
+			top: 49px;
+			width: 170px;
+			right: 0;
+			display: none;
+		}
+		.item {
+			border-bottom: solid 1px;
+			padding: 10px;
+		}
+		.item:hover {
+			background: lightblue;
+			color: white;
+		}
+		.show {
+			display: block;
+		}
+
+		</style>
+
+		
+	</head>
+	<body>
+		<div class='chk-component'>
+			<label>
+				Reddit
+				<input class='check-box' type='checkbox' />
+				<span class='custom'></span>
+			</label>
+		</div>
+
+		<div class='chk-component'>
+			<label>
+				Pininterest
+				<input class='radio-box' name='gender' type='radio' />
+				<span class='radio-custom'></span>
+			</label>
+			<label>
+				Instagram
+				<input class='radio-box' name='gender' type='radio' />
+				<span class='radio-custom'></span>
+			</label>
+		</div>
+
+		<div class='chk-component'>
+			<label>
+				Gmail
+				<input class='toggle-box' type='checkbox' />
+				<span class='toggle-custom'></span>
+			</label>
+		</div>
+		<div class='chk-component'>
+				<label>
+					<select>
+						<option>Facebook</option>
+						<option>Instagram</option>
+						<option>Youtube</option>
+					</select>
+				</label>
+				<div class='dropdown-main'>
+					<div class="select">select</div>
+					<div class="arrow"></div>
+					<div class='option-cont'>
+							<div class="item">Facebook</div>
+							<div class="item">Instagram</div>
+							<div class="item">Youtube</div>
+						</div>
+				</div>
+				
+		</div>
+			<script>
+				const dropdownCont = document.querySelector('.dropdown-main');
+				dropdownCont.addEventListener('click', (event) => {
+					console.log('parent', event);
+					document.querySelector('.option-cont').classList.toggle('show');
+					document.querySelector('.arrow').classList.toggle('reverse-arrow')
+				});
+				const optionsCont = document.querySelector('.option-cont');
+				const selectedItem = document.querySelector('.select');
+				selectedItem.textContent = 'Facebook'
+				optionsCont.addEventListener('click', (event) => {
+					console.log('eve', event, event.target.textContent);
+					selectedItem.textContent = event.target.textContent;
+				});
+			</script>
+	</body>
+</html>

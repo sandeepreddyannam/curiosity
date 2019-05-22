@@ -25,7 +25,10 @@
     "mammoth": "^1.4.4",
     "typescript": "^2.7.2",
     "webpack": "^3.10.0",
-    "webpack-watchman-plugin": "^1.1.0"
+    "webpack-watchman-plugin": "^1.1.0",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4"
   },
   "devDependencies": {
     "css-loader": "^0.28.9",

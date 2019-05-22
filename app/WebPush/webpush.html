@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title> Web push Demo</title>
+        <script src='./webpush.js'></script>
+        <link href='./webpush.css' rel="stylesheet" type="text/css" />
+    </head>
+    <body onload='checkServiceWorker()'>
+        <div>
+            <h1> Web push notifications</h1>
+            <button onclick="checkPermission(event)">Check Permission</button>
+            <button onclick="showPrompt()">Request Permission</button>
+
+            <h2> Subscribe to web push</h2>
+            <button onclick="subscribe()">Subscribe</button>
+        </div>
+    </body>
+</html>

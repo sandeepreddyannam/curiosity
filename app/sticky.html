@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			sticky components
+		</title>
+		<style>
+			.item {
+			padding: 20px;
+			font-size: 18px;
+			background: yellow;
+			}
+			.parent {
+				display: flex;
+			}
+			.sidebar {
+				width: 30%;
+				border: solid 2px red;
+				position: sticky;
+				top: 0;
+				height: 1700px;
+			}
+			.right {
+				width: 70%;
+				height: 2500px;
+				background: gray;
+				text-align: center;
+				padding: 40px;
+				border: solid 2px lawngreen;
+			}
+			.footer {
+				padding: 30px;
+				background: green;
+				border: solid 2px violet;
+				position: sticky;
+				bottom: 0;
+			}
+			.more {
+				height: 500px;
+				padding: 30px;
+				background: aquamarine;
+				border: solid 2px orange;
+			}
+		</style>
+	</head> 
+	<body>
+			<div class='container'>
+				<div class='parent'>
+					<div class='sidebar'>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+						<div class='item'>  sidebar </div>
+
+					</div>
+					<div class='right'>
+						right content
+					</div>
+				</div>
+				<div class='footer'> Footer </div>
+				<div class='more'>
+					some more items
+				</div>
+			</div>
+	</body>
+</html>
