@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>Survey Page</title>
+        <style>
+            body {
+				background: white;
+				font-family: Roboto, sans-serif;
+                
+			}
+			img {
+                width: 70px;
+                margin-bottom: 12px;
+                display: block;
+                border: solid 1px #f0f0f0;
+			}
+            .form {
+                padding: 15px;
+            }
+            button {
+                background: white;
+                padding: 10px;
+                border-radius: 20px;
+                border: none;
+                font-size: 15px;
+            }
+            .container {
+                width: 400px;
+                background: #f0f0f0;
+                margin: auto;
+                height: 600px;
+                border-radius: 30px;
+                box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2);
+            }
+            .qusn-container {
+                padding: 15px;
+                font-size: 14px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .question-text {
+                padding-bottom: 16px;
+            }
+            .hide {
+                display: none;
+            }
+            .show {
+                display: block;
+            }
+            .input-list {
+                padding: 10px;
+                background: white;
+                margin-bottom: 16px;
+            }
+            label {
+                padding-left: 16px;
+            }
+            .border-cls {
+                border: solid 1px blue;
+            }
+            .btn-container {
+                display: flex;
+                justify-content: space-between;
+                background: #092B40;
+                padding: 10px;
+                opacity: 0;
+            }
+            .opacity-cls {
+                opacity: 1;
+            }
+        
+        </style>
+    </head>
+    <body>
+        <div class="container">
+    
+        </div>
+    </body>
+    <script>
+            getSurveyQuestions(); // put it in some Dom loaded method.
+            var finalRes = {};
+            var count = 0;
+            var submitRes = {};
+
+			function getSurveyQuestions () {
+				const url = 'https://flipkart-survey-mock.now.sh/';
+				fetch(url).then(
+					res => res.json()
+				).then(json => {
+                    console.log('json', json);
+                    finalRes = json;
+                    renderQuestion(finalRes[0]);
+					
+				})
+            }
+            
+            function renderQuestion(questionResponse) {
+                console.log('res', questionResponse);
+                // Extract values
+                const questionId = questionResponse.id;
+                const optionalText = !questionResponse.required ? 'Optional' : '';
+                const optionType = questionResponse.optionType;
+                const multiSelect = questionResponse.multiSelect
+
+                const questionText = questionResponse.question.text;
+                const questionOptions = questionResponse.options || [];
+        
+                const container = document.querySelector('.container');
+
+                const questionIdEl = document.createElement('div');
+                questionIdEl.id = questionId;
+
+                const qusnContEl = document.createElement('div');
+                qusnContEl.className = 'qusn-container';
+
+                const qusnEl = document.createElement('div');
+                qusnEl.textContent =  `Question ${count + 1} / ${finalRes.length}`;
+                qusnEl.className = "question";
+
+                const optionalEl = document.createElement('div');
+                optionalEl.textContent = optionalText;
+                optionalEl.className = "optional";
+
+                qusnContEl.appendChild(qusnEl);
+                qusnContEl.appendChild(optionalEl);
+
+                questionIdEl.appendChild(qusnContEl);
+
+                const formEl = document.createElement('div');
+                formEl.className = 'form';
+
+                const qusnTxtEl = document.createElement('div');
+                qusnTxtEl.textContent = questionText;
+                qusnTxtEl.className = 'question-text';
+
+                const optionTxtEl = document.createElement('div');
+                optionTxtEl.className = 'options-list';
+
+                renderOptionalList(questionOptions, multiSelect, optionTxtEl, optionType);
+
+                formEl.appendChild(qusnTxtEl);
+                formEl.appendChild(optionTxtEl);
+                renderSubmitButton(questionResponse.required, formEl);
+
+                questionIdEl.appendChild(formEl);
+                container.appendChild(questionIdEl);
+
+            }
+
+            function renderOptionalList(options, multiSelect, parent, optionType) {
+
+                options.map(eachOption => {
+                    const contEl = document.createElement('div');
+                    contEl.className = 'input-list';
+
+                    const labelText = eachOption.label.text;
+                    const value = eachOption.value;
+                    if (optionType === "image_text") {
+                        const img = eachOption && eachOption.img && eachOption.img.src;
+                        const imgeEl = document.createElement('img');
+                        imgeEl.src = img;
+                        contEl.appendChild(imgeEl);
+                    }
+
+                    let inputEl = document.createElement('input');
+                    const labelEl = document.createElement('label');
+                    const currentQsn = finalRes[count];
+
+                    if(!multiSelect) {
+                        inputEl.type = 'radio';
+                        inputEl.value = value;
+                        inputEl.name = finalRes[count].id;
+                        labelEl.textContent = labelText;
+                    } else {  
+                        inputEl.type = 'checkbox';
+                        inputEl.value = value;
+                        labelEl.textContent = labelText;
+                    }
+                    
+                    inputEl.onchange = handleOnChange(currentQsn)
+                    contEl.appendChild(inputEl);
+                    contEl.appendChild(labelEl);
+
+                    parent.appendChild(contEl);
+
+
+                });
+
+            }
+
+            function renderSubmitButton(required, parent) {
+                const buttonCont = document.createElement('div');
+                const buttonEl = document.createElement('button');
+                // buttonEl.type ='submit';
+                buttonEl.className = 'button';
+                buttonEl.classList.add('hide');
+                buttonEl.textContent = 'Continue';
+                buttonEl.onclick = handleContinueClick;
+                
+
+                const skipEl = document.createElement('button');
+                skipEl.className = 'skip-btn';
+                skipEl.textContent = 'Skip';
+                skipEl.onclick = handleContinueClick;
+    
+                required && skipEl.classList.add('hide');
+                buttonCont.appendChild(skipEl);
+                buttonCont.className = 'btn-container'
+                
+
+                buttonCont.appendChild(buttonEl);
+
+                parent.appendChild(buttonCont);
+            }
+
+            function handleOnChange (qsn) {
+                return (event) => {
+                    
+                    const button = document.querySelector('.button');
+                    button.classList.add('show');
+                    document.querySelector('.btn-container').classList.add('opacity-cls');
+                    event.target.classList.add('border-cls');
+                    
+                    console.log('e', qsn, event.target.value, event.target.classList);
+
+                    // Prepare final Response.
+                
+                }
+            }
+
+            function handleContinueClick(event) {
+                console.log('event', event);
+                if (count+1 < finalRes.length) {
+                    const currentQsnId = finalRes[count].id;
+                    const container = document.querySelector('.container');
+                    const removeCurrent = document.getElementById(currentQsnId);
+                    removeCurrent.remove();
+
+                    count++;
+                    const nextQusnRes = finalRes[count];
+                    renderQuestion(nextQusnRes);
+                }
+            }
+    </script>
+</html>

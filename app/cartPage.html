@@ -11,7 +11,7 @@
 				width: 50px;
 				margin-bottom: 12px;
 			}
-			input {
+			.input {
 				outline: none;
 				width: 20px;
 				text-align: center;
@@ -45,11 +45,14 @@
 				font-weight: bold;
 				padding: 16px 24px;
 				border-bottom: solid 1px #f0f0f0;
+				padding-bottom: 0px;
 			}
 			.summary {
-				width: 30%;
 				background: white;
 				margin-left: 8px;
+				position: fixed;
+				right: 18px;
+				width: 28%;
 			}
 			.sum-cont {
 				display: flex;
@@ -72,6 +75,7 @@
 				width: 30%;
 				font-weight: bold;
 				font-size: 14px;
+				text-align: right;
 			}
 			.title {
 				font-size: 16px;
@@ -103,34 +107,246 @@
 				justify-content: space-between;
 				padding: 20px;
 			}
+			.border-cls {
+				border-bottom: dotted 2px #f0f0f0;
+			}
+			.saved {
+				color: green;
+				font-size: 14px;
+				font-weight: bold;
+				padding: 20px;
+				border: solid 1px #e0e0e0;
+				border-left: none;
+				border-right: none;
+			}
+			.toast {
+				width: 500px;
+				position: fixed;
+				background: lightyellow;
+				color: black;
+				bottom: 36px;
+				border: dotted 3px orange;
+				padding: 10px;
+				left: 50%;
+				transform: translate(-50%, 200%);
+				text-align: center;
+				box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.1);
+				transition: transform 300ms ease-in;
+				opacity: 0;
+			}
+			.show-toast {
+				opacity: 1;
+				transform: translate(-50%, -50%);
+				transition: transform 300ms ease-in;
+			}
+			.cart {
+				padding-bottom: 16px;
+			}
+			.pincode {
+				outline: none;
+				border: none;
+				border-bottom: solid 0.5px black;
+				padding: 18px 6px 8px;
+				font-size: 16px;
+				cursor: pointer;
+			}
+			/* .pincode:focus {
+				border-bottom: solid 2px #2874f0;
 
+			} */
+			.pincode-cont {
+				position: relative;
+			}
+			.focus-border {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 100%;
+				height: 2px;
+				transition: 0.5s;
+			}
+			.focus-border::before {
+				position: absolute;
+				content: '';
+				left: 0;
+				width: 0;
+				height: 100%;
+				background: #2874f0;
 
+			}
+			.focus-border::after {
+				position: absolute;
+				content: '';
+				left: auto;
+				right: 0;
+				width: 0;
+				height: 100%;
+				background: #2874f0;
+			}
+			.pincode:focus ~ .focus-border::before {
+				width: 50%;
+				transition: 0.5s;
+				/* right: 0; */
+			}
+			.pincode:focus ~ .focus-border::after {
+				width: 50%;
+				transition: 0.5s;
+				/* right: 0; */
+			}
+			.hide-unavailable {
+				opacity: 0;
+			}
+			.unavailable {
+				text-align: center;
+				border: dotted 2px orange;
+				padding: 10px;
+				margin-top: 14px;
+				opacity: 1;
+				border-radius: 30px;
+				font-weight: normal;
+				background: lightyellow;
+				transition: opacity 400ms ease-in;
+			}
+			.change {
+				position: absolute;
+				top: 16px;
+				right: 0;
+				cursor: pointer;
+				font-size: 13px;
+				color: #2874f0;
+			}
+			.placeholder {
+				position: absolute;
+				top: 14px;
+				font-weight: normal;
+				color: #878787;
+				transition: all 400ms ease;
+			}
+			.pincode:focus ~.placeholder {
+				position: absolute;
+				font-size: 12px;
+				top: 0;
+				transition: all 400ms ease;
+			}
+			.pincode:valid ~.placeholder {
+				position: absolute;
+				font-size: 12px;
+				top: 0;
+				transition: all 400ms ease;
+			}
+			.pincode-dropdown {
+				position: absolute;
+				width: 169px;
+				background: white;
+				border: solid 1px #f0f0f0;
+				padding: 10px 5px;
+				box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2);
+				font-size: 14px;
+				z-index: 2;
+				min-height: 30px;
+				font-weight: normal;
+				opacity: 0;
+			}
+			.show {
+				opacity: 1;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
 			<div class="items-cont">
 				<div class="header">
-					<div> MY CART</div>
-					<div>Pincode</div>
+					<div class="cart"> MY CART</div>
+					<form class="pincode-cont" onsubmit="handlePincodeChange(event)">
+						<label>
+							<input class="pincode" required pattern="[0-9]{6}" maxlength="6" onchange="handlePincodeChange(event)" onfocus="handlePincodeFocus()" />
+							<span class="placeholder">Enter Pincode</span>
+							<span class="change" onclick="changePincode()">Change</span>
+							<span class="focus-border"></span>
+						</label>
+						<div class="pincode-dropdown">
+							drop down list
+						</div>
+					</form>
 				</div>
 				<div class="items">
 
 				</div>
 			</div>
 			<div class="summary">
-				<div class="header">
+				<div class="header" style="padding-bottom: 16px">
 					PRICE DETAILS
 				</div>
-				<div>
-
-				</div>
 			</div>
-			
+		</div>
+		<div class="toast">
+			Maximum limit has been reached.
 		</div>
 		<script>
 			getCartProducts(); // put it in some loaded method.
 			var finalRes = {};
+			var actualRes = {};
+			var pincodesArr = [];
+
+			function handlePincodeChange (event) {
+				event && event.preventDefault();
+				const pincode = document.querySelector('.pincode').value;
+				console.log('pincode', pincode, actualRes);
+
+				const focusEl = document.querySelector('.pincode-dropdown');
+				focusEl.classList.remove('show');
+				
+				if(pincode.length === 6 && !event.target.value) {
+					
+					
+					pincodesArr.push(pincode);
+					// localStorage.setItem('pincodes', JSON.stringify(pincodesArr));
+				}
+				console.log(pincodesArr);
+
+				let unavailable = {};
+				actualRes.map(item => {
+					const arr = item.availability.unavailable_pincodes;
+					arr.map(unavailablePincode => {
+						if (pincode === unavailablePincode) {
+							unavailable[item.product_id] = true;
+						} else {
+							unavailable[item.product_id] = false;
+						}
+					});
+				});
+
+				unavailable && Object.keys(unavailable).map(pid => {
+					const el = document.getElementById(pid);
+					if (el && unavailable[pid]){
+						el.textContent = `Currently Out Of stock for ${pincode}`;
+						el.classList.add('unavailable');
+					} else {
+						el.textContent = '';
+						el.classList.remove('unavailable');
+					}
+				});
+			}
+
+			function changePincode () {
+				const pincode = document.querySelector('.pincode');
+				pincode.value = '';
+				pincode.focus();
+			}
+
+			function handlePincodeFocus () {
+				const focusEl = document.querySelector('.pincode-dropdown');
+				focusEl.classList.add('show');
+					let pinEls;
+
+					if (pincodesArr.length > 0) {
+						pincodesArr.map(pin => {
+						pinEls += `<li>${pin}</li>`
+					});
+					focusEl.innerHTML = `<ul>${pinEls}</ul>`;
+					}
+					
+			}
 
 			function getCartProducts () {
 				const url = 'https://flipkart-mock-cart.now.sh/';
@@ -138,6 +354,7 @@
 					res => res.json()
 				).then(json => {
 					console.log('json', json);
+					actualRes = json;
 					loadProducts(json);
 					renderPriceSummary();
 				})
@@ -155,8 +372,11 @@
 				const pricing = item.pricing;
 				const availability = item.availability;
 				const purchaseInfo = item.purchase_instructions;
-				const pid = item.product_id; 
+				const pid = item.product_id;
+				const maxLimit = purchaseInfo.max_purchase_limit;
 
+				
+				// constructing final response.
 				finalRes = { ...finalRes,
 					[pid] : {
 						sp: pricing.selling_price,
@@ -176,29 +396,35 @@
 				summaryDiv.className = 'sum-cont';
 				containerDiv.appendChild(summaryDiv);
 
-				renderImage(summary, summaryDiv, pid);
+				renderImage(summary, summaryDiv, pid, maxLimit);
 				renderSummary(summary, pricing, summaryDiv);
-				renderDeliveryInfo(pricing, containerDiv);
+				renderDeliveryInfo(pricing, containerDiv, pid);
 			}
 
-			function renderDeliveryInfo(pricing, parent) {
+			function renderDeliveryInfo(pricing, parent, pid) {
 				const deliveryCharge = pricing && pricing.delivery_charge;
-				if (!deliveryCharge) {
-					return;
-				}
+				// if (!deliveryCharge) {
+				// 	return;
+				// }
+				const divParentEl = document.createElement('div');
+				divParentEl.className = 'dlvry-cls';
 
 				const divEl = document.createElement('div');
-				divEl.innerHTML = `Delivery Charge: &#8377;${deliveryCharge}`;
-				divEl.className = 'dlvry-cls';
+				divEl.innerHTML = deliveryCharge ? `Delivery Charge: &#8377;${deliveryCharge}` : '';
+				const unavailableDivEl = document.createElement('div');
+				unavailableDivEl.id = pid;
+				unavailableDivEl.className = 'hide-unavailable';
 
-				parent.appendChild(divEl);
+				divParentEl.appendChild(divEl);
+				divParentEl.appendChild(unavailableDivEl);
+				parent.appendChild(divParentEl);
+				
 			}
 
 			function renderSummary(summary, pricing, parent) {
 				const title = summary.title;
 				const mrp = pricing && pricing.mrp;
 				const sellingPrice = pricing && pricing.selling_price;
-				
 
 				const contEl = document.createElement('div');
 				const titleEl = document.createElement('div');
@@ -208,11 +434,11 @@
 				titleEl.className = 'title';
 
 				const spEl = document.createElement('span');
-				spEl.textContent = sellingPrice;
+				spEl.textContent = sellingPrice.toLocaleString('en-IN');
 				spEl.className = 'sp';
 
 				const mrpEl = document.createElement('span');
-				mrpEl.textContent = mrp; // striked out
+				mrpEl.textContent = mrp.toLocaleString('en-IN'); // striked out
 				mrpEl.className = 'mrp';
 
 				const discountEl = document.createElement('span');
@@ -231,7 +457,7 @@
 				parent.appendChild(contEl);
 			}
 
-			function renderImage(summary, parent, pid) {
+			function renderImage(summary, parent, pid, maxLimit) {
 				const img = summary.img;
 				const divEl = document.createElement('div');
 				const imgEl = document.createElement('img');
@@ -239,22 +465,23 @@
 				divEl.className = 'img-cls';
 				divEl.appendChild(imgEl);
 
-				renderCounter(divEl, pid);
+				renderCounter(divEl, pid, maxLimit);
 
 				parent.appendChild(divEl);
 			}
 
-			function renderCounter(parent, pid) {
+			function renderCounter(parent, pid, maxLimit) {
 				const input = document.createElement('input');
 				input.maxLength = '1';
 				input.value = 1; 
+				input.className = "input";
 
 				const decEl = document.createElement('button');
 				decEl.onclick = removeItem(pid, input);
 
 
 				const incEl = document.createElement('button');
-				incEl.onclick = addItem(pid, input);
+				incEl.onclick = addItem(pid, input, maxLimit);
 
 				decEl.textContent = '-';
 				incEl.textContent = '+';
@@ -269,16 +496,27 @@
 				console.log('final', finalRes);
 			}
 
-			function addItem (pid, input) {
+			function addItem (pid, input, maxLimit) {
+				const toast = document.querySelector('.toast');
 				return event => {
-					console.log(pid);
-					if (finalRes[pid].quantity > 0) {
+					console.log(pid, maxLimit);
+					if (finalRes[pid].quantity < maxLimit) {
 						finalRes[pid].quantity = finalRes[pid].quantity + 1;
 						input.value = finalRes[pid].quantity;
+						updatePriceSummary();
+						console.log(finalRes, pid);
+					} else {
+						toast.classList.add('show-toast');
+						const toastId = setTimeout(hideToast, 3000);
+						console.log('timerId', toastId);
 					}
-					updatePriceSummary();
-					console.log(finalRes, pid);
+					
 				}
+			}
+
+			function hideToast () {
+				const toast = document.querySelector('.toast');
+				toast.classList.remove('show-toast');
 			}
 
 			function removeItem (pid, input) {
@@ -308,7 +546,7 @@
 				itemPriceEl.id = 'quantity';
 
 				const rupeesDiv = document.createElement('div');
-				rupeesDiv.innerHTML = `&#8377;${finalItemPrice}`;
+				rupeesDiv.innerHTML = `&#8377;${finalItemPrice.toLocaleString('en-IN')}`;
 				rupeesDiv.id = 'quantityRs';
 				
 				priceDiv.appendChild(itemPriceEl);
@@ -321,12 +559,13 @@
 				chargeEl.textContent = 'Delivery charge'
 
 				const rupeesEl = document.createElement('div');
-				rupeesEl.innerHTML = `&#8377;${deliveryCharge}`;
+				rupeesEl.innerHTML = `&#8377;${deliveryCharge.toLocaleString('en-IN')}`;
 				rupeesEl.id = 'deliveryRs';
 				
 				deliveryEl.appendChild(chargeEl);
 				deliveryEl.appendChild(rupeesEl);
 				deliveryEl.className = 'final-price';
+				deliveryEl.classList.add('border-cls');
 
 				// total amount
 				const totalEl = document.createElement('div');
@@ -334,17 +573,24 @@
 				totalTextEl.textContent = 'Amount Payable';
 
 				const totalRupeesEl = document.createElement('div');
-				totalRupeesEl.innerHTML = `&#8377;${amountPayable}`;
+				totalRupeesEl.innerHTML = `&#8377;${amountPayable.toLocaleString('en-IN')}`;
 				totalRupeesEl.id = 'totalRs';
 				
 				totalEl.appendChild(totalTextEl);
 				totalEl.appendChild(totalRupeesEl);
 				totalEl.className = 'final-price';
 
-
+				// saved amount
+				const savedEl = document.createElement('div');
+				savedEl.innerHTML = `Your total savings on this order &#8377;${getSavedAmount().toLocaleString('en-IN')}`;
+				savedEl.className = 'saved';
+				savedEl.id = 'savedRs'
+				
 				priceCont.appendChild(priceDiv);
 				priceCont.appendChild(deliveryEl);
 				priceCont.appendChild(totalEl);
+
+				priceCont.appendChild(savedEl);
 			}
 
 			function getQuantity() {
@@ -352,7 +598,6 @@
 				Object.keys(finalRes).forEach(key => {
 					q = q + finalRes[key].quantity;
 				});
-				console.log('quantity', q);
 
 				return q;
 			}
@@ -362,7 +607,6 @@
 				Object.keys(finalRes).forEach(key => {
 					q = q + (finalRes[key].sp * finalRes[key].quantity);
 				});
-				console.log('SP', q);
 
 				return q;
 			}
@@ -371,26 +615,37 @@
 				Object.keys(finalRes).forEach(key => {
 					q = q + finalRes[key].deliveryCharge;
 				});
-				console.log('DC', q);
 
 				return q;
 			}
+
+			function getSavedAmount() {
+				let q = 0;
+				Object.keys(finalRes).forEach(key => {
+					q = q + (finalRes[key].quantity * finalRes[key].saving);
+				});
+
+				return q;
+			}
+
 			function updatePriceSummary () {
 				const quantity = document.getElementById('quantity');
 				const quantityRs = document.getElementById('quantityRs');
 				const deliveryRs = document.getElementById('deliveryRs');
 				const totalRs = document.getElementById('totalRs');
+				const savedRs = document.getElementById('savedRs');
 
 				const itemQuantity = getQuantity();
 				const finalItemPrice = getFinalItemPrice();
 				const deliveryCharge = getDeliveryCharge();
+				const savedAmount = getSavedAmount();
 				const amountPayable = finalItemPrice + deliveryCharge;
 
 				quantity.textContent = `Price (${itemQuantity} items)`;
-				quantityRs.innerHTML = `&#8377;${finalItemPrice}`;
-				deliveryRs.innerHTML = `&#8377;${deliveryCharge}`;
-				totalRs.innerHTML = `&#8377;${amountPayable}`;
-
+				quantityRs.innerHTML = `&#8377;${finalItemPrice.toLocaleString('en-IN')}`;
+				deliveryRs.innerHTML = `&#8377;${deliveryCharge.toLocaleString('en-IN')}`;
+				totalRs.innerHTML = `&#8377;${amountPayable.toLocaleString('en-IN')}`;
+				savedRs.innerHTML = `Your total savings on this order &#8377;${savedAmount.toLocaleString('en-IN')}`;
 			}
 
 
