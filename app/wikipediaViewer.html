@@ -17,7 +17,6 @@
 			.center {
 				display: flex;
 				align-items: center;
-				justify-content: center;
 				flex-direction: column;
 				height: 100vh;
 			}
@@ -44,13 +43,35 @@
 				opacity: 0;
 			}
 			.input::after {
-				content: 'x';
+				/* content: 'x'; */
 			}
 			.input-display {
 				display: block;
 				width: 240px;
 				opacity: 1;
 			}
+			.header {
+				color: lightblue;
+				font-size: 20px;
+				margin-bottom: 10px;
+				display: block;
+				text-decoration: underline;
+			}
+			.description {
+				font-size: 16px;
+				line-height: 1.5;
+			}
+			.list {
+				margin: 0 auto;
+				width: 80%;
+			}
+			.container {
+				padding: 18px;
+				border: solid 1px white;
+				border-radius: 10px;
+				margin: 12px 0;
+			}
+			
 		</style>
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.0/axios.js'></script>
 	</head>
@@ -59,52 +80,113 @@
 			<a target='blank' href="https://en.wikipedia.org/wiki/Special:Random">Click here for a random article</a>
 			<div style='text-align: center; margin: 10px 0;'>
 				<img class='img' src='./Icons/searchIcon.png' onclick="hideImage()">
-				<form onsubmit="getSearchResults(event)">
-					<input type='search' class='input' />
+				<form onSubmit="handleChange(event)">
+					<input type='text' class='input' onInput='handleChange(event)' defaultValue='' />
+					<!-- <button type="submit">Submit</button> -->
 				</form>
 			</div>
-			<div>Click Icon to Search</div>
+			<div class="text">Click Icon to Search</div>
+			<div class='list'>
+
+			</div>
 		</div>
 
 		<script>
-		function hideImage() {
-			const imgEl = document.querySelector('.img');
-			const inputEl = document.querySelector('.input');
-			imgEl.classList.add('hide');
-			inputEl.classList.add('input-display');
-		}
+			function handleChange(e) {
+				e && e.preventDefault();
+				console.log('e', e);
+				const searchText = event.target && event.target.value && event.target.value || '';
+				const wikiURL = `https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${searchText.trim()}`;
 
-		function getSearchResults(event) {
-			event && event.preventDefault();
-			console.log('ev', event);
-			const inputValue = document.querySelector('.input').value;
-			if (!inputValue) {
-				alert('please enter value');
-			} else {
-				// Using axios to pull data
-				// const url = 'https://pokeapi.co/api/v2/pokemon/';
-				// axios.get(url + inputValue).then(res => {
-				// 	console.log('axios', res);
-				// });
-				// fetch(`https://en.wikipedia.org/w/api.php?format=json&action=query&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|extracts&pilimit=max&exintro&explaintext&exsentences=1&exlimit=max&gsrsearch=${inputValue}&callback=angular.callbacks._1`, {mode: 'no-cors'}).then(res => {
-				// 	console.log('fetch', res);
-				// 	return res.json();
-				// }).then(json => {
-				// 	console.log('actual fetch', json);
-				// });
-				fetch('http://localhost:4000/').then(res => {
-					console.log('fetch', res);
-					
-					return res.text();
+				fetch(wikiURL).then((res) => {
+					console.log(res);
+					return res.json();
 				}).then(json => {
-					const divEl = document.createElement('div');
-					const parent = document.querySelector('.center');
-					console.log('actual fetch', json);
-					divEl.innerHTML = json;
-					parent.appendChild(divEl);
+					console.log('json', json);
+					const list = document.querySelector('.list');
+					list.textContent = '';
+					showResults(json);
 				});
+
 			}
-		}
+			function showResults(json=[]) {
+				const list = document.querySelector('.list');
+
+				const target = [];
+				json.map((item, index) => {
+					if(Array.isArray(item)) {
+						item.map((subitem, i) => {
+							if (index === 1) {
+								target.push({header: subitem})
+							} else if (index === 2) {
+								target[i].description = subitem;
+							} else if (index === 3) {
+								target[i].link = subitem;
+							}
+						})
+					}
+				});
+				console.log('target', target);
+				target.map(section => {
+					renderUI(section)
+				})
+			}
+
+			function renderUI(section) {
+				const divEl = document.createElement('div');
+				const list = document.querySelector('.list');
+				divEl.className = 'container';
+				divEl.appendChild(renderHeader(section));
+				divEl.appendChild(renderDescription(section));
+				list.appendChild(divEl);
+
+			}
+
+			function renderHeader(item) {
+				const anchorEl = document.createElement('a');
+				anchorEl.textContent = item.header;
+				anchorEl.setAttribute('href', item.link);
+				anchorEl.setAttribute('target', '_blank');
+				anchorEl.className = 'header';
+				return anchorEl;
+			}
+			function renderDescription(item) {
+				const divEl = document.createElement('div');
+				divEl.textContent = item.description;
+				divEl.className = 'description';
+				return divEl;
+			}
+
+			function hideImage() {
+				const imgEl = document.querySelector('.img');
+				const inputEl = document.querySelector('.input');
+				const textEl = document.querySelector('.text');
+				textEl.classList.add('hide');
+				imgEl.classList.add('hide');
+				inputEl.classList.add('input-display');
+			}
+
+			function getSearchResults(event) {
+				// Gets HTML Files and pastes in the DOM
+				event && event.preventDefault();
+				console.log('ev', event);
+				const inputValue = document.querySelector('.input').value;
+				if (!inputValue) {
+					alert('please enter value');
+				} else {
+					fetch(`http://localhost:4000/getHtml?path=${inputValue}`).then(res => {
+						console.log('fetch', res);
+						
+						return res.text();
+					}).then(json => {
+						const divEl = document.createElement('div');
+						const parent = document.querySelector('.center');
+						console.log('actual fetch', json);
+						divEl.innerHTML = json;
+						parent.appendChild(divEl);
+					});
+				}
+			}
 		
 		</script>
 	</body>

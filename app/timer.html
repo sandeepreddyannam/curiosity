@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				font-size: 20px;
+				text-align: center;
+				font-family: Roboto,sans-serif;
+				background-color: #222;
+				height: 100vh;
+				color: #fafafa;
+			}
+			button:focus {
+				outline: none;
+				
+			}
+			button:hover {
+				background-color: blue;
+				border: blue;
+			}
+			.container {
+				display: flex;
+				margin: 100px 0;
+				justify-content: center;
+			}
+			.clock-container {
+				padding: 20px;
+				width: 30%;
+				text-align: center;
+				border: solid 2px grey;
+				background-color: #161b1f;
+				/* box-shadow: 0 3px 6px #0c0c0c; */
+				box-shadow: 0 26px 83px red;
+				margin-right: 100px;
+				border-radius: 4px;
+			}
+			.timer {
+				display: flex;
+				padding: 40px 0;
+				font-size: 38px;
+				justify-content: center;
+				align-items: center;
+			}
+			.time-el {
+				margin: 0 20px;
+			}
+			.start,
+			.up-btn {
+				font-size: 25px;
+				color: white;
+				background: black;
+				margin: 10px 0;
+			}
+			.down-btn {
+				font-size: 25px;
+				color: white;
+				background: black;
+				margin: 10px 0;
+				transform: rotate(180deg);
+			}
+			.label {
+				font-size: 14px
+			}
+			.separator {
+				margin-top: 14px;
+			}
+		</style>
+	</head>
+	<body onload="loadClock()">
+		<div class='container'>
+			<div class="clock-container">
+				<h1>Clock</h1>
+	
+				<div class="timer">
+					<div class="hours"></div>
+					<div class="mins"></div>
+					<div class="secs"></div>
+				</div>
+			</div>
+			
+			<div class="clock-container">
+				<h1>Countdown</h1>
+				<div class="timer">
+						<div class="time-el">
+							<div class="label">Hours</div>
+							<button class="up-btn" onClick='setCountDownTimeClick(event)' id='up-hr'>⇧</button>
+							<div class="chours">0</div>
+							<button class="down-btn" onClick='setCountDownTimeClick(event)' id='down-hr'>⇧</button>
+						</div>
+						<div class="separator">:</div>
+						<div class="time-el">
+							<div class="label" >Mins</div>
+							<button class="up-btn" onClick='setCountDownTimeClick(event)' id='up-min'>⇧</button>
+							<div class="cmins">0</div>
+							<button class="down-btn" onClick='setCountDownTimeClick(event)' id='down-min'>⇧</button>
+						</div>
+						<div class="separator">:</div>
+						<div class="time-el">
+							<div class="label">Secs</div>
+							<button class="up-btn" onClick='setCountDownTimeClick(event)' id='up-sec'>⇧</button>
+							<div class="csecs">0</div>
+							<button class="down-btn" onClick='setCountDownTimeClick(event)' id='down-sec'>⇧</button>
+						</div>
+				</div>
+				<button class="start" onClick="startCountDown()">Start</button>
+			</div>
+			<!-- <div class="clock-container"></div> -->
+		</div>
+		
+
+
+		<script>
+			/** Objective: 
+			 *  To understand date objects and its various uses
+			 *  To experiment setTimeout and setIntervals
+			 * */
+
+			function loadClock () {
+				const date = new Date();
+				const hours = date.getHours();
+				const mins = date.getMinutes();
+				const secs = date.getSeconds();
+
+				document.querySelector('.hours').textContent = hours + ' hr : ';
+				document.querySelector('.mins').textContent = mins + ' mins : ';
+				document.querySelector('.secs').textContent = secs + ' secs';
+				setTimeout(loadClock, 1000);
+			};
+
+			/********************************************************/
+			// countdownTimer();
+
+			function countdownTimer (tomDate) {
+				// const tomDate = new Date(2019, 08, 19, 3);
+				const curDate = new Date();
+				const timeDiff = tomDate - curDate;
+				// console.log(timeDiff, tomDate, curDate);
+				// console.log(timeDiff);
+				if (timeDiff > 0) {
+					// const daysDiff = Math.floor(timeDiff / (24 * 60 * 60 * 1000))
+					const hourDiff = Math.floor( (timeDiff % (24 * 60 * 60 * 1000) ) / (60 * 60 * 1000));
+					const minDiff = Math.floor((timeDiff % (60 * 60 * 1000) / (60 * 1000)));
+					const secDiff = Math.floor( (timeDiff % (60 * 1000)) / 1000);
+
+					document.querySelector('.chours').textContent = hourDiff;
+					document.querySelector('.cmins').textContent = minDiff;
+					document.querySelector('.csecs').textContent = secDiff;
+				} else {
+					clearInterval(timerID);
+					hrCount = 0;
+					minCount = 0;
+					secCount = 0;
+					alert('Its Over');
+				}
+			}
+
+			let hrCount = 0;
+			let minCount = 0;
+			let secCount = 0;
+
+			function setCountDownTimeClick(event) {
+				console.log(event);
+
+				if (event.target.id === 'up-hr' && hrCount<23) {
+					hrCount++;
+					document.querySelector('.chours').textContent = hrCount;
+				} else if (event.target.id === 'down-hr' && hrCount > 0) {
+					hrCount--;
+					document.querySelector('.chours').textContent = hrCount;
+				} else if (event.target.id === 'up-min' && minCount < 60) {
+					minCount++;
+					document.querySelector('.cmins').textContent = minCount;
+				} else if (event.target.id === 'down-min' && minCount > 0) {
+					minCount--;
+					document.querySelector('.cmins').textContent = minCount;
+				} else if (event.target.id === 'up-sec' && secCount < 60) {
+					secCount++;
+					document.querySelector('.csecs').textContent = secCount;
+				} else if (event.target.id === 'down-sec' && secCount > 0) {
+					secCount--;
+					document.querySelector('.csecs').textContent = secCount;
+				}
+				console.log(hrCount, minCount, secCount);
+
+			}
+			var timerId = null;
+
+			function startCountDown () {
+				const curDate = new Date();
+				const tomDate = new Date(curDate.getFullYear(), curDate.getMonth(), curDate.getDate(), curDate.getHours() + hrCount , curDate.getMinutes() + minCount, curDate.getSeconds() + secCount)
+				// console.log(curDate, tomDate);
+				timerID = setInterval(() => {
+					countdownTimer(tomDate)
+				}, 1000);
+
+				// if (tomDate.getTime() - curDate.getTime() < 0) {
+				// 	clearInterval(timerID);
+				// }
+			}
+			
+
+			function stopWatch () {
+
+			}
+
+			function numberAnimator () {
+
+			}
+
+
+		</script>
+		
+
+	</body>
+</html>
