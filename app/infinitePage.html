@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8">
+		<title>
+			Infinite Page
+        </title>
+        <style>
+            .container {
+                padding: 20px;
+                background: gray;
+                /* height: 100vh;   */
+            }
+            .block {
+                border: solid 1px white;
+                width: auto;
+                height: 300px;
+                box-shadow: inset 0 0 10px 000;
+                background: white;
+                margin-bottom: 10px;
+            }
+
+        </style>
+        <script src='Utils/debounce.js' type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="block">
+            </div>
+            <div class="block">
+            </div>
+            <div class="block">
+            </div>
+
+        </div>
+        <script>
+
+            function createBlock() {
+                const container = document.querySelector('.container');
+                const divEl = document.createElement('div');
+                divEl.className = 'block';
+                divEl.textContent = `Block`
+                container.appendChild(divEl);
+            }
+
+            function handleScroll() {
+                const docEl = document.documentElement;
+                //check if we reached bottom
+                console.log('scroll', window.pageYOffset, docEl.clientHeight, docEl.offsetHeight, docEl.scrollHeight);
+                const bottom = docEl.getBoundingClientRect().bottom;
+                console.log(docEl.getBoundingClientRect());
+                if (bottom < docEl.clientHeight + 100) {
+                    createBlock();
+                }
+                // if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                //     createBlock();
+                // }
+            }
+
+            window.addEventListener('scroll', debounce(handleScroll, 300)) //check with debounce
+
+
+        </script>
+
+    </body>
+</html>

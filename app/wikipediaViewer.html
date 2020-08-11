@@ -73,15 +73,16 @@
 			}
 			
 		</style>
+		<script src='Utils/debounce.js' type="text/javascript"></script>
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.0/axios.js'></script>
 	</head>
-	<body>
+	<body onLoad="attachListeners(event)">
 		<div class='center'>
 			<a target='blank' href="https://en.wikipedia.org/wiki/Special:Random">Click here for a random article</a>
 			<div style='text-align: center; margin: 10px 0;'>
 				<img class='img' src='./Icons/searchIcon.png' onclick="hideImage()">
 				<form onSubmit="handleChange(event)">
-					<input type='text' class='input' onInput='handleChange(event)' defaultValue='' />
+					<input type='text' class='input' value='' />
 					<!-- <button type="submit">Submit</button> -->
 				</form>
 			</div>
@@ -92,14 +93,30 @@
 		</div>
 
 		<script>
+			function attachListeners(event) {
+				console.log('attach', event);
+				window.addEventListener('scroll', (e) => {
+					// console.log('scroll', e, window.scrollY)
+				});
+				document.querySelector('.input').addEventListener('input', throttle(handleChange, 3000));
+
+				// document.querySelector('.input').addEventListener('input', function(e)  {
+				// 		console.log('listener', this);
+				// 		debounce(handleChange, 3000).bind(this, e)();
+				// 	}
+				// 	// debounce(handleChange, 300)
+				// );
+				
+				
+			}
+
 			function handleChange(e) {
 				e && e.preventDefault();
 				console.log('e', e);
-				const searchText = event.target && event.target.value && event.target.value || '';
+				const searchText = e.target && e.target.value && e.target.value || '';
 				const wikiURL = `https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${searchText.trim()}`;
 
 				fetch(wikiURL).then((res) => {
-					console.log(res);
 					return res.json();
 				}).then(json => {
 					console.log('json', json);
@@ -107,8 +124,8 @@
 					list.textContent = '';
 					showResults(json);
 				});
-
 			}
+
 			function showResults(json=[]) {
 				const list = document.querySelector('.list');
 
@@ -126,7 +143,7 @@
 						})
 					}
 				});
-				console.log('target', target);
+				// console.log('target', target);
 				target.map(section => {
 					renderUI(section)
 				})
